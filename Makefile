@@ -2,9 +2,9 @@ PYTHONPATH=$(shell pwd)
 UNITTESTS=$(shell find */ -type f -iname 'test_*.py')
 MAINS=$(shell find */ -type f -iname '*.py')
 
-all: cov
+all: sonar
 
-.PHONY: clean main test coverage cov
+.PHONY: clean main test coverage cov sonar
 
 main:
 	@for target in ${MAINS}; do\
@@ -39,6 +39,10 @@ coverage:
 	done
 	@coverage report
 	@coverage html
+
+
+sonar: cov
+	sonar-scanner -X
 
 
 clean:

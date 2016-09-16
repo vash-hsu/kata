@@ -24,7 +24,7 @@ test:
 
 cov:
 	-nosetests */test* --with-coverage --cover-erase --cover-inclusive \
-	--cover-package=sec --cover-tests --cover-branches --cover-html \
+	--cover-tests --cover-branches --cover-html \
 	--cover-xml --cover-xml-file=coverage_unittest.xml \
 	--with-xunit --xunit-file=nosetests_unittest.xml
 

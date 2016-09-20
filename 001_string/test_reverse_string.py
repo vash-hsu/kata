@@ -37,17 +37,17 @@ class StringTest(unittest.TestCase):
         expected = "dlrow olleh"
         self.assertEqual(reverse_string(example), expected)
 
-    def test_long_string(self):
-        "PERF: long string reverse, pythonic is better"
-        import timeit
-        sec_better = timeit.timeit(stmt="better()",
-                                   setup="from __main__ import better",
-                                   number=100)
-        sec_worse = timeit.timeit(stmt="worse()",
-                                  setup="from __main__ import worse",
-                                  number=100)
-        self.assertLess(sec_better, sec_worse)
-        print sec_better, "vs.", sec_worse
+    # def test_long_string(self):
+    #     "PERF: long string reverse, pythonic is better"
+    #     import timeit
+    #     sec_better = timeit.timeit(stmt="better()",
+    #                                setup="from __main__ import better",
+    #                                number=100)
+    #     sec_worse = timeit.timeit(stmt="worse()",
+    #                               setup="from __main__ import worse",
+    #                               number=100)
+    #     self.assertLess(sec_better, sec_worse)
+    #     print sec_better, "vs.", sec_worse
 
 
 def print_usage(name):

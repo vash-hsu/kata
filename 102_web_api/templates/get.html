@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery.getJSON demo</title>
+  <script src="/static/script/jquery-3.1.1.min.js"></script>
+</head>
+<body>
+
+<script>
+
+//var resource_path = "/api/v1/resource";
+var resource_path = "{{ target_url }}";
+
+
+function fun_get_resource_list(_base_url)
+{
+  // http://stackoverflow.com/questions/14643617/create-table-using-javascript
+
+  // insert table to html body
+  var body = document.body;
+  var table = document.createElement('table');
+  table.style.width  = '100px';
+  table.style.border = '1px solid black';
+  var tr = table.insertRow();
+  var td = tr.insertCell();
+  td.appendChild(document.createTextNode("name"));
+  td.style.border = '1px solid black';
+  td = tr.insertCell();
+  td.appendChild(document.createTextNode("link for GET"));
+  td.style.border = '1px solid black';
+  // retrieve data
+  jQuery.ajax({
+    url: _base_url,
+    type: "GET",
+    contentType: 'application/json; charset=utf-8',
+    success: function(resultData){
+      data_list = resultData.listing;
+      var str_for_title = "click here to view!";
+      // console.log(data_list);
+      data_list.forEach(
+        function(element){
+          var tr = table.insertRow();
+          var td = tr.insertCell();
+          td.appendChild(document.createTextNode(element));
+          td.style.border = '1px solid black';
+          td = tr.insertCell();
+          //
+          var target_url_path = _base_url.concat("/", element);
+          var a = document.createElement('a');
+          var linkText = document.createTextNode(target_url_path);
+          a.appendChild(linkText);
+          a.title = str_for_title;
+          a.href = target_url_path;
+          td.appendChild(a);
+          td.style.border = '1px solid black';
+        }
+      );
+    },
+    error: function(jqXHR, textStatus, errorThrown){
+    },
+    timeout: 10000,
+  });
+  // ending
+  body.appendChild(table);
+}
+
+fun_get_resource_list(resource_path);
+
+</script>
+ 
+</body>
+</html>

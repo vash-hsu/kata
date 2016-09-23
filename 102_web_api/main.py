@@ -5,8 +5,8 @@ from flask import url_for
 from flask import request
 from flask import Response
 from flask import render_template
+from flask import send_from_directory
 
-import json
 import demjson
 import hashlib
 
@@ -26,7 +26,43 @@ STORAGE = {
 
 @app.route("/")
 def api_root():
-    return "Welcome"
+    html_body = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <title>RESTful Demo Site</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" href="%s">
+    </head>
+    <body>
+
+    <div class="jumbotron text-center">
+      <h1>Web Console for RESTful API </h1>
+      <p>a simple web ui to access and manipulate hosted resource</p>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-3">
+          <h3>Help</h3>
+    %s
+        </div>
+        <div class="col-sm-3">
+          <h3>Operation Console</h3>
+    %s
+        </div>
+        <div class="col-sm-3">
+          <h3>Log</h3>
+    %s
+        </div>
+      </div>
+    </div>
+    </body>
+    </html>
+    """ % (url_for('static', filename='css/bootstrap.css'),
+           _help_index(), _console_index(), _log_index())
+    return html_body
 
 
 def _help_index(keyword=None):
@@ -42,7 +78,7 @@ def _console_index(keyword=None):
     content = list()
     for op in ACCEPT_OP:
         content.append("<p><a href=\"%s\">op console for %s</a> ...</p>"
-                       % (url_for('api_helps') + "/" + op, op))
+                       % (url_for('console') + "/" + op.lower(), op))
     html = "\n".join(content)
     return html
 
@@ -54,6 +90,15 @@ def _log_index(keyword=None):
       <p>visualization of structure content...</p>
 """
     return html
+
+
+@app.route("/console")
+@app.route("/console/<opcode>")
+def console(opcode='get'):
+    if opcode == 'get':
+        return render_template("get.html", target_url="/api/v1/resource")
+    else:
+        return render_template("get.html", target_url="wrong")
 
 
 @app.route("/help")
@@ -70,8 +115,8 @@ def api_helps():
 <body>
 
 <div class="jumbotron text-center">
-  <h1>Web Console for RESTful API </h1>
-  <p>a simple web ui to access and manipulate hosted resource</p>
+  <h1>Help Page for RESTful API</h1>
+  <p>a simple web page to tell how to integrate provided APIs</p>
 </div>
 
 <div class="container">
@@ -80,20 +125,12 @@ def api_helps():
       <h3>Help</h3>
 %s
     </div>
-    <div class="col-sm-3">
-      <h3>Operation Console</h3>
-%s
-    </div>
-    <div class="col-sm-3">
-      <h3>Log</h3>
-%s
-    </div>
   </div>
 </div>
 </body>
 </html>
 """ % (url_for('static', filename='css/bootstrap.css'),
-       _help_index(), _console_index(), _log_index())
+       _help_index())
     return html_body
 
 
@@ -124,6 +161,11 @@ def api_help(operator):
        operator,
        OP[operator])
     return html
+
+
+@app.route("/static/<path:file_path>")
+def send_static(file_path):
+    return send_from_directory("static", file_path)
 
 
 def _api_split_version_resource(string_path):

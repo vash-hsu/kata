@@ -20,8 +20,9 @@ OP = {"GET": "returns list of all objects",
 ACCEPT_OP = ['GET', 'PUT', 'POST', 'DELETE']
 
 STORAGE = {
-    "123456789": "value for golden key",
-    "test_data": "value for test_data"}
+    "123456789": {'hello': 'world'},
+    "test_data": {'test': 'data'}
+}
 
 
 @app.route("/")
@@ -95,10 +96,26 @@ def _log_index(keyword=None):
 @app.route("/console")
 @app.route("/console/<opcode>")
 def console(opcode='get'):
-    if opcode == 'get':
-        return render_template("get.html", target_url="/api/v1/resource")
+    if opcode in ('get', 'post', 'delete'):
+        return render_template("get.html",
+                               resource_url="/api/v1/resource",
+                               ui_put_url="/ui/put",
+                               ui_delete_url="/ui/delete")
     else:
         return render_template("get.html", target_url="wrong")
+
+
+@app.route("/ui/<path:path>")
+def form_ui(path):
+    terms = path.split('/')
+    if len(terms) != 2:
+        return "not supported", 400
+    action, resource_id = terms
+    if action in ('put', 'delete'):
+        return render_template("form_edit.html",
+                               resource_url="/api/v1/resource",
+                               action_type=action,
+                               resource_id=resource_id)
 
 
 @app.route("/help")
@@ -229,6 +246,7 @@ def _handle_api_and_json(method, headers, data, resource_id=None):
         error_msg.append('should provide content-type as application/json')
     else:
         try:
+            # print "DM:", repr(data)
             json_in_dict = demjson.decode(data)
         except BaseException:
             error_msg.append('fail to decode incoming json')

@@ -27,7 +27,7 @@ class TestFlaskRequest(unittest.TestCase):
         target_url = self.host_url + "/"
         header, body = self.handle.request(target_url, 'GET')
         self.assertEqual(header['status'], '200')
-        self.assertIn("Welcome", body)
+        self.assertIn("RESTful Demo Site", body)
 
     def test_api_split_version_resource(self):
         "input v1/resource, return [v1, resource]"
@@ -55,7 +55,6 @@ class TestFlaskRequest(unittest.TestCase):
         self.assertEqual(header['content-type'], "application/json")
         json_dict = demjson.decode(body)
         self.assertEqual(json_dict["status"], '1')
-        self.assertIn("golden key", json_dict["value"])
 
     def test_api_v1_api_get_element_by_not_found_id(self):
         "=== GET  with undefined resource_id, and then get JSON back with status 0"

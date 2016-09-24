@@ -2,33 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>jQuery.getJSON demo</title>
+  <title>console for GET</title>
   <script src="/static/script/jquery-3.1.1.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/static/css/bootstrap.css">
 </head>
 <body>
 
 <script>
 
-//var resource_path = "/api/v1/resource";
-var resource_path = "{{ target_url }}";
+var resource_path = "{{ resource_url }}";
+var ui_put_path = "{{ ui_put_url }}";
+var ui_delete_path = "{{ ui_delete_url }}";
 
-
-function fun_get_resource_list(_base_url)
+function fun_get_resource_list(_base_url, _ui_put, _ui_delete)
 {
   // http://stackoverflow.com/questions/14643617/create-table-using-javascript
 
   // insert table to html body
   var body = document.body;
   var table = document.createElement('table');
-  table.style.width  = '100px';
-  table.style.border = '1px solid black';
+  table.className  = 'table table-striped';
   var tr = table.insertRow();
   var td = tr.insertCell();
   td.appendChild(document.createTextNode("name"));
-  td.style.border = '1px solid black';
   td = tr.insertCell();
-  td.appendChild(document.createTextNode("link for GET"));
-  td.style.border = '1px solid black';
+  td.appendChild(document.createTextNode("link for GET/list"));
+  td = tr.insertCell();
+  td.appendChild(document.createTextNode("link for PUT/update"));
+  td = tr.insertCell();
+  td.appendChild(document.createTextNode("link for DELETE/delete"));
   // retrieve data
   jQuery.ajax({
     url: _base_url,
@@ -36,24 +39,39 @@ function fun_get_resource_list(_base_url)
     contentType: 'application/json; charset=utf-8',
     success: function(resultData){
       data_list = resultData.listing;
-      var str_for_title = "click here to view!";
       // console.log(data_list);
       data_list.forEach(
         function(element){
           var tr = table.insertRow();
           var td = tr.insertCell();
           td.appendChild(document.createTextNode(element));
-          td.style.border = '1px solid black';
+          // url for get
           td = tr.insertCell();
-          //
           var target_url_path = _base_url.concat("/", element);
           var a = document.createElement('a');
           var linkText = document.createTextNode(target_url_path);
           a.appendChild(linkText);
-          a.title = str_for_title;
+          a.title = "click here to view!";
           a.href = target_url_path;
           td.appendChild(a);
-          td.style.border = '1px solid black';
+          // url for put
+          td = tr.insertCell();
+          target_url_path = _ui_put.concat("/", element);
+          a = document.createElement('a');
+          linkText = document.createTextNode(target_url_path);
+          a.appendChild(linkText);
+          a.title = "click here to update!";
+          a.href = target_url_path;
+          td.appendChild(a);
+          // url for delete
+          td = tr.insertCell();
+          target_url_path = _ui_delete.concat("/", element);
+          a = document.createElement('a');
+          linkText = document.createTextNode(target_url_path);
+          a.appendChild(linkText);
+          a.title = "click here to delete!";
+          a.href = target_url_path;
+          td.appendChild(a);
         }
       );
     },
@@ -65,7 +83,7 @@ function fun_get_resource_list(_base_url)
   body.appendChild(table);
 }
 
-fun_get_resource_list(resource_path);
+fun_get_resource_list(resource_path, ui_put_path, ui_delete_path);
 
 </script>
  

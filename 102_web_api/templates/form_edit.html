@@ -22,12 +22,18 @@
 <div class="form-group">
   <label class="col-md-4 control-label" for="radios">options</label>
   <div class="col-md-4">
+    {% if put %}
     <label class="radio-inline" for="radios-1">
-      <input name="radios" id="radios-1" value="'update'" type="radio" checked="checked">
+      <input name="radios" id="radios-put" value="'update'" type="radio" checked="checked">
       put/update
     </label>
+    {% endif %}
     <label class="radio-inline" for="radios-2">
-      <input name="radios" id="radios-2" value="'delete'" type="radio">
+      {% if put %}
+      <input name="radios" id="radios-delete" value="'delete'" type="radio">
+      {% else %}
+      <input name="radios" id="radios-delete" value="'delete'" type="radio" checked="checked">
+      {% endif %}
       delete
     </label>
   </div>
@@ -57,8 +63,16 @@
 <script>
 
 var resource_url = "{{ resource_url }}";
-var action_type = "{{ action_type }}";
-var resource_id = "{{ resource_id }}";
+
+{% if put %}
+var action_type = "put";
+var resource_id = "{{ put }}";
+{% else %}
+var action_type = "delete";
+var resource_id = "{{ delete }}";
+{% endif %}
+
+var referer_url = "{{ referer_url }}";
 
 function update_text_field(json_object)
 {
@@ -84,12 +98,8 @@ function retrieve_json(_base_url, _id)
   });
 }
 
-function post_json(_url, _id, user_input)
+function put_json(_url, _id, user_input)
 {
-  // alert(_base_url);
-  // alert(_id);
-  // alert(user_input);
-
   var target_url = _url.concat("/", _id);
     jQuery.ajax({
       url: target_url,
@@ -111,13 +121,54 @@ function post_json(_url, _id, user_input)
       },
       timeout: 10000,
     });
+}
 
+// delete_json(resource_url, resource_id);
+function delete_json(_url, _id)
+{
+  var target_url = _url.concat("/", _id);
+    jQuery.ajax({
+      url: target_url,
+      type: "DELETE",
+      data: "{}",
+      contentType: 'application/json; charset=utf-8',
+      success: function(resultData){
+        if (parseInt(resultData.status) < 0)
+        {
+          alert('server return reason = '.concat(resultData.reason.toString()))
+        }
+        else {
+          alert('Successfully to delete resource '.concat(_id));
+          if (referer_url.length == 0) // close current tab
+          {
+            window.top.close();
+          }
+          else
+          {
+            window.location.href = referer_url;
+          }
+
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown)
+      {
+      },
+      timeout: 10000,
+    });
 }
 
 function click_submit()
 {
-  user_inpu = document.getElementById("json_input").value;
-  post_json(resource_url, resource_id, user_inpu);
+  //if (document.getElementById("radios-put").checked)
+  if ((document.getElementById("radios-put")) && (document.getElementById("radios-put").checked))
+  {
+    user_inpu = document.getElementById("json_input").value;
+    put_json(resource_url, resource_id, user_inpu);
+  }
+  else if (document.getElementById("radios-delete").checked)
+  {
+    delete_json(resource_url, resource_id);
+  }
 }
 
 document.getElementById("button2confirm").disabled = true;

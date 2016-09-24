@@ -40,7 +40,8 @@
  * (done) /console/get
 * put/update object
  * (done) /ui/put/123456789
-* (todo) delete object
+ * (done) delete object
+  
 * (todo) put object
 
 == to do

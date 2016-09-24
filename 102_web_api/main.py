@@ -105,17 +105,36 @@ def console(opcode='get'):
         return render_template("get.html", target_url="wrong")
 
 
+def _get_referer_from_headers(headers):
+    """
+    :param headers:  dict
+    :return:  string with referer url or empty string
+    """
+    previous_url = ""
+    for i in headers.keys():
+        if i.lower() == "referer":
+            previous_url = headers[i]
+            break
+    return previous_url
+
+
 @app.route("/ui/<path:path>")
 def form_ui(path):
+    previous_url = _get_referer_from_headers(request.headers)
     terms = path.split('/')
     if len(terms) != 2:
         return "not supported", 400
     action, resource_id = terms
-    if action in ('put', 'delete'):
+    if action in ('put',):
         return render_template("form_edit.html",
                                resource_url="/api/v1/resource",
-                               action_type=action,
-                               resource_id=resource_id)
+                               put=resource_id,
+                               referer_url=previous_url)
+    if action in ('delete',):
+        return render_template("form_edit.html",
+                               resource_url="/api/v1/resource",
+                               delete=resource_id,
+                               referer_url=previous_url)
 
 
 @app.route("/help")

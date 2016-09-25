@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.blogspot.rulesare.restapiclientdemo.MainActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="1"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:text="IP"
+                android:layout_width="54dp"
+                android:layout_height="match_parent"
+                android:id="@+id/textView2"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                android:textSize="28sp" />
+
+            <EditText
+                android:layout_width="147dp"
+                android:layout_height="match_parent"
+                android:inputType="textPersonName"
+                android:text="192.168.2.103"
+                android:ems="10"
+                android:id="@+id/edittext_ip"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                android:background="#FF0000"
+                android:textSize="20sp" />
+
+            <TextView
+                android:text="PORT"
+                android:layout_width="67dp"
+                android:layout_height="match_parent"
+                android:id="@+id/textView3"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                android:textSize="20sp" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/edittext_port"
+                android:layout_weight="1"
+                android:text="5000"
+                android:background="#FF0000"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="53dp">
+
+            <TextView
+                android:text="GET"
+                android:layout_width="86dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/textview1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+
+            <Spinner
+                android:layout_width="match_parent"
+                android:id="@+id/spinner"
+                android:spinnerMode="dropdown"
+                android:layout_height="40sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="Name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/textView"
+                    android:layout_weight="1"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:inputType="textPersonName"
+                    android:text="HELLO-WORLD-001"
+                    android:ems="10"
+                    android:id="@+id/edittext_rid"
+                    android:layout_weight="1"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="200sp"
+            android:layout_weight="0.78">
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:inputType="textMultiLine"
+            android:ems="10"
+            android:id="@+id/edittext_json"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:text="{\n    'name': 'value'\n}"
+            android:isScrollContainer="true"
+            android:keepScreenOn="true"
+            android:background="#00FFFF"
+            android:layout_weight="0.23" />
+        </ScrollView>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:text="Create/PUT"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/button2put"
+                android:layout_weight="1" />
+
+            <Button
+                android:text="Update/POST"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/button2post"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:text="Delete"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/button2delete"
+                android:layout_weight="1" />
+
+            <Button
+                android:text="Reset"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/button2reset"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

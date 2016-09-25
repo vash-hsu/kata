@@ -9,6 +9,7 @@
 ###GET /api/v1/resource
 * return JSON to tell object list
  * (pass) test_api_v1_api_get_all_elements_list
+   
 ###GET /api/v1/resource/resource-id
 * return JSON to tell object's value
  * (pass) test_api_v1_api_get_element_by_id
@@ -32,7 +33,7 @@
  * (pass) test_api_v1_post_then_delete
  * (pass) test_api_v1_delete_disallow_nonexistent_id
  * (pass) test_api_v1_delete_disallow_action_without_id
-
+  
 --
 ##Web Interface and Test Kit
   
@@ -47,15 +48,22 @@
   
 ###post(new) object
 * (done) /console/post
-
+  
 --
 ##Logging Mechanism
+* (done) /static/log/rest_api_server.log
   
 ###log for http server
-* (done) on stdout
+* (done) on log file
   
 ###log for rest api
-* (done) on stdout
+* (done) on log file
   
-== to do
-* (tba) Android App to Interact with Web API
+###visualization (in debug log)
+* (done) pretty for json or object
+  
+--
+##Web Interface and Test Kit* (tba) Android App to Interact with Web API
+### ../103_rest_client
+* (done) android app with one activity, one spinner, four editTexts and few buttons
+* (todo) integrate http request for rest API demo

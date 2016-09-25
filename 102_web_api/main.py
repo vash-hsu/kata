@@ -9,6 +9,8 @@ from flask import send_from_directory
 
 import demjson
 import hashlib
+import json
+import pprint
 
 import logging
 import logging.config
@@ -93,11 +95,15 @@ def _console_index(keyword=None):
 
 
 def _log_index(keyword=None):
+
+    html_part = """<p><a href =\"{}\">click here to download</a></p>""".\
+        format(url_for('static', filename="log/rest_api_server.log"))
     html = """
-      <p>timestamp of request...</p>
-      <p>received data...</p>
-      <p>visualization of structure content...</p>
-"""
+      <p>(v) timestamp of request...</p>
+      <p>(v) received data...</p>
+      <p>(v) visualization of structure content...</p>
+      <p>{}</p>
+""".format(html_part)
     return html
 
 
@@ -236,6 +242,19 @@ def api(resource_path):
     api_version = terms[0]
     res_type = terms[1]
     resource_id = None
+    # logging for business logic
+    http_log.info('request method: {}'.format(request.method))
+    http_log.info('request full_path: {}'.format(request.full_path))
+    if len(request.args) > 0:
+        http_log.info('request args: {}'.format(repr(request.args)))
+    # http_log.info('request headers: {}'.format(repr(request.headers)))
+    for i in request.headers:
+        http_log.info('request header: {}={}'.format(i[0], i[1]))
+    http_log.info('request body: {}'.format(repr(request.data)))
+    if len(request.data) > 0:
+        http_log.debug("pretty print\n{}".
+                       format(_pretty_json_in_text(request.data)))
+    #
     if len(terms) == 3:
         resource_id = terms[2]
     if api_version != "v1":
@@ -260,8 +279,10 @@ def api(resource_path):
     resp = Response(response_body)
     resp.headers['Content-type'] = "application/json"
     for i in resp.headers.keys():
-        http_log.debug("response header: {}={}".format(i, resp.headers[i]))
-    http_log.debug("response body = {}".format(response_body))
+        http_log.info("response header: {}={}".format(i, resp.headers[i]))
+    http_log.info("response body = {}".format(response_body))
+    http_log.debug("pretty print\n{}".
+                   format(_pretty_json_in_text(response_body)))
     return resp
 
 
@@ -366,6 +387,21 @@ def _get_sha1_in_string(data):
     return sha1.hexdigest()
 
 
+def _pretty_json_in_text(meta):
+    result = ""
+    if isinstance(meta, str) or isinstance(meta, unicode):
+        try:
+            result = json.dumps(json.loads(meta), indent=4, sort_keys=True)
+        except BaseException as err:
+            print "DM:", repr(err.message)
+            printer = pprint.PrettyPrinter(indent=4, width=1)
+            result = printer.pformat(meta)
+    else:
+        printer = pprint.PrettyPrinter(indent=4, width=1)
+        result = printer.pformat(meta)
+    return result
+
+
 # ===
 # api implementation
 # ===
@@ -465,8 +501,4 @@ if __name__ == '__main__':
     api_log = logging.getLogger('restAPI')
     main_log = logging.getLogger('main')
     #
-    # http_log.debug('debug message')
-    # api_log.debug('debug message')
-    # main_log.debug('debug message')
-    #
-    app.run(debug=False)
+    app.run(debug=False, host="0.0.0.0")

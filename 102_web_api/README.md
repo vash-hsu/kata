@@ -34,15 +34,28 @@
  * (pass) test_api_v1_delete_disallow_action_without_id
 
 --
-
 ##Web Interface and Test Kit
-* list all objects
- * (done) /console/get
-* put/update object
- * (done) /ui/put/123456789
- * (done) delete object
- * (done) put object
+  
+###list all objects
+* (done) /console/get
+  
+###put(update) object
+* (done) /ui/put/123456789
+  
+###delete object
+* (done) /ui/delete/123456789
+  
+###post(new) object
+* (done) /console/post
 
+--
+##Logging Mechanism
+  
+###log for http server
+* (done) on stdout
+  
+###log for rest api
+* (done) on stdout
+  
 == to do
-
 * (tba) Android App to Interact with Web API

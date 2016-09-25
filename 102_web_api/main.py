@@ -96,13 +96,16 @@ def _log_index(keyword=None):
 @app.route("/console")
 @app.route("/console/<opcode>")
 def console(opcode='get'):
-    if opcode in ('get', 'post', 'delete'):
+    if opcode in ('get', 'put', 'delete'):
         return render_template("get.html",
                                resource_url="/api/v1/resource",
                                ui_put_url="/ui/put",
                                ui_delete_url="/ui/delete")
+    elif opcode == 'post':
+        return render_template("form_post.html",
+                               resource_url="/api/v1/resource")
     else:
-        return render_template("get.html", target_url="wrong")
+        return "", 404
 
 
 def _get_referer_from_headers(headers):
@@ -122,6 +125,10 @@ def _get_referer_from_headers(headers):
 def form_ui(path):
     previous_url = _get_referer_from_headers(request.headers)
     terms = path.split('/')
+    if len(terms) == 1 and terms[0] == 'post':
+        return render_template("form_post.html",
+                               resource_url="/api/v1/resource",
+                               referer_url=previous_url)
     if len(terms) != 2:
         return "not supported", 400
     action, resource_id = terms

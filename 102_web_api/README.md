@@ -41,8 +41,7 @@
 * put/update object
  * (done) /ui/put/123456789
  * (done) delete object
-  
-* (todo) put object
+ * (done) put object
 
 == to do
 

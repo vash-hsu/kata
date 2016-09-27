@@ -421,13 +421,13 @@ def _api_get(resource_id=None):
         api_log.info("getting all list: {}".
                       format(demjson.encode(dict_for_return['listing'])))
     elif resource_id in STORAGE:
-        dict_for_return['status'] = '1'
+        dict_for_return['status'] = 1
         dict_for_return['value'] = STORAGE[resource_id]
         api_log.info("getting content of {}: {}".
                      format(resource_id,
                             demjson.encode(dict_for_return['value'])))
     else: # unrecognized id
-        dict_for_return['status'] = '0'
+        dict_for_return['status'] = 0
         api_log.warning("fail to get {}, which is nonexistent".
                         format(resource_id))
     json_meta = demjson.encode(dict_for_return)

@@ -63,7 +63,7 @@
 * (done) pretty for json or object
   
 --
-##Web Interface and Test Kit* (tba) Android App to Interact with Web API
+##Android App to Interact with Web API
 ### ../103_rest_client
 * (done) android app with one activity, one spinner, four editTexts and few buttons
 * (todo) integrate http request for rest API demo

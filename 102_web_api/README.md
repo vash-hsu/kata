@@ -32,6 +32,10 @@
  * (pass) test_api_v1_post_by_creating_new_id_without_slash
  * (pass) test_api_v1_post_by_creating_new_id_with_slash
   
+###POST /resource/resource-id
+* (todo) add item to resource, with user-specified name (resource_id)
+  
+  
 ###DELETE /resource/resource-id
 * delete item from resource
 * return JSON to tell result
@@ -75,9 +79,9 @@
  * (done) listing all elements' names, via http get
  * (done) show value of selected element, via http get 
 * Buttons
+ * (done) delete
  * (todo) put
  * (todo) post
- * (todo) delete
 
 * (todo) integrate http request for rest API demo
   

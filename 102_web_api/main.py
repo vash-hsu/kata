@@ -270,6 +270,8 @@ def api(resource_path):
                                         'reason': '%s not supported' % _method})
     elif _method == "GET":
         response_body = _api_get(resource_id)
+    elif _method == "DELETE":
+        response_body = _api_delete(resource_id)
     else:
         response_body = _handle_api_and_json(_method,
                                              request.headers,
@@ -288,7 +290,7 @@ def api(resource_path):
 
 def _handle_api_and_json(method, headers, data, resource_id=None):
     """
-    :param method:  PUT/POST/DELETE
+    :param method:  PUT/POST
     :param headers:  Content-Type
     :param data:  JSON
     :param resource_id:  string
@@ -323,19 +325,14 @@ def _handle_api_and_json(method, headers, data, resource_id=None):
                 error_msg.append("POST needs not user-specified resource_id")
                 http_log.warning("not allow specified resource_id {} for post".
                                  format(resource_id))
-        elif method == "DELETE":
-            if _is_valid_id(resource_id):  # delete legacy
-                return _api_delete(json_in_dict, resource_id)
-            else:
-                error_msg.append("DELETE needs existent resource_id")
-                http_log.warning("not allow to delete resource_id {}".
-                                 format(repr(resource_id)))
         else:
             error_msg.append('not support method with %s' % repr(resource_id))
             http_log.warning("not support method {} on resource_id {}".
                              format(method, repr(resource_id)))
+    # return demjson.encode({'status': str(0-len(error_msg)),
+    #                       'reason': error_msg})
     return demjson.encode({'status': str(0-len(error_msg)),
-                           'reason': error_msg})
+                           'reason': "; ".join(error_msg)})
 
 
 # ===
@@ -421,15 +418,16 @@ def _api_get(resource_id=None):
         api_log.info("getting all list: {}".
                       format(demjson.encode(dict_for_return['listing'])))
     elif resource_id in STORAGE:
-        dict_for_return['status'] = 1
+        dict_for_return['status'] = 0
         dict_for_return['value'] = STORAGE[resource_id]
         api_log.info("getting content of {}: {}".
                      format(resource_id,
                             demjson.encode(dict_for_return['value'])))
     else: # unrecognized id
-        dict_for_return['status'] = 0
-        api_log.warning("fail to get {}, which is nonexistent".
-                        format(resource_id))
+        dict_for_return['status'] = -1
+        reason = "fail to get {}, which is nonexistent".format(resource_id)
+        dict_for_return['reason'] = [reason, ]
+        api_log.warning(reason)
     json_meta = demjson.encode(dict_for_return)
     #
     if dict_for_return['status'] > 0:
@@ -479,18 +477,26 @@ def _api_post(json_meta):
 
 
 # DELETE: deletes item
-def _api_delete(json_meta, resource_id):
+def _api_delete(resource_id):
     """
     :param json_meta:
     :param resource_id:
     :return:
     """
-    api_log.info("deleting {}".format(resource_id))
-    _remove_from_internal_storage(resource_id)
-    status = '1'
-    return_data = demjson.encode({'status': status, 'id': resource_id})
-    api_log.info("success({}) to delete resource id = {}".format(status,
-                                                                 resource_id))
+    if not _is_valid_id(resource_id):
+        msg = "not allow to delete resource_id {}".format(repr(resource_id))
+        status = -1
+        return_data = demjson.encode({'status': status,
+                                      'reason': [msg, ]})
+
+        http_log.warning(msg)
+    else:
+        api_log.info("deleting {}".format(resource_id))
+        _remove_from_internal_storage(resource_id)
+        status = 0
+        return_data = demjson.encode({'status': status, 'value': resource_id})
+        api_log.info("success({}) to delete resource id = {}".format(status,
+                                                                     resource_id))
     return return_data
 
 

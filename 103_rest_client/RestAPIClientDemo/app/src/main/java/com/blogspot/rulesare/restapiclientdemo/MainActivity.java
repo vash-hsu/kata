@@ -18,20 +18,17 @@ import android.content.Context;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 
 import java.io.InputStream;
-import java.io.StreamCorruptedException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.security.SecureRandom;
-import java.math.BigInteger;
-
 
 
 // for http request, rest api and json
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -142,34 +139,44 @@ public class MainActivity extends AppCompatActivity {
 
     public void callback_draw_spinner(String[] string_array)
     {
-        arrayTesting = new String[string_array.length+1];
-        arrayTesting[0] = String.valueOf("... new ...");
-        System.arraycopy(string_array, 0, arrayTesting, 1, string_array.length);
-        arraySpinner = arrayTesting;
-        my_adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arraySpinner);
-        my_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        my_spinner.setAdapter(my_adapter);
+        if (string_array == null) // no list
+        {
+            arrayTesting = new String[1];
+            arrayTesting[0] = String.valueOf("... new ...");
+            arraySpinner = arrayTesting;
+            my_adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arraySpinner);
+            my_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            my_spinner.setAdapter(my_adapter);
+        }
+        else
+        {
+            arrayTesting = new String[string_array.length+1];
+            arrayTesting[0] = String.valueOf("... new ...");
+            System.arraycopy(string_array, 0, arrayTesting, 1, string_array.length);
+            arraySpinner = arrayTesting;
+            my_adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arraySpinner);
+            my_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            my_spinner.setAdapter(my_adapter);
+        }
     }
 
     //  [networking] --> MyHttpHelper() --> callback_draw_spinner()
     private void draw_spinner()
     {
         Log.d("DM: draw_spinner", "... ");
-        // retrieve resource lists from REST API\
         String string_ip = edittext_ip.getText().toString();
         String string_port = edittext_port.getText().toString();
-
         MyRestAPI my_api = new MyRestAPI(string_ip, string_port, my_context);
         if (my_api.isOnline())
         {
-            new MyHttpHelper().execute(
-                    my_api.rest_get_full_url(),
-                    "get",
-                    my_api.rest_get_option("listing")
-                    );
+            new MyHttpHelper().execute( my_api.rest_get_full_url(), "get", "");
         }
-        // ===
-
+        else
+        {
+            Toast.makeText(my_context,
+                    "Houston, we have a networking problem",
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void refresh_gui_after(String action)
@@ -196,9 +203,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //  [networking] --> MyHttpHelper() --> refresh_gui_after(put)
-    //  [networking] --> MyHttpHelper() --> refresh_gui_after(post)
-    //  [networking] --> MyHttpHelper() --> refresh_gui_after(delete)
     private void action_for_button(Button button2click)
     {
         Log.d("DM: action_for_button", "... " + button2click.getText().toString());
@@ -223,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.button2delete:
                 result = wrapper_for_rest_utility(resource_id, "", "delete");
-                Toast.makeText(my_context, "deleting " + resource_id + " then " + result,
+                Toast.makeText(my_context, result,
                         Toast.LENGTH_SHORT).show();
                 refresh_gui_after("delete");
                 break;
@@ -237,6 +241,17 @@ public class MainActivity extends AppCompatActivity {
     private void callback_draw_edittext(String string_text)
     {
         edittext_json.setText(string_text);
+    }
+
+    private void callback_toast(String message)
+    {
+        Toast.makeText(my_context, message,
+                Toast.LENGTH_SHORT).show();
+    }
+
+    private void callback_draw_error_reason(String[] error)
+    {
+
     }
 
     //  [networking] --> MyHttpHelper() --> callback_draw_edittext()
@@ -254,10 +269,7 @@ public class MainActivity extends AppCompatActivity {
             MyRestAPI my_api = new MyRestAPI(string_ip, string_port, my_context);
             if (my_api.isOnline())
             {
-                new MyHttpHelper().execute(
-                        my_api.rest_get_full_url(resource_id),
-                        "get",
-                        my_api.rest_get_option("value"));
+                new MyHttpHelper().execute(my_api.rest_get_full_url(resource_id), "get", "");
             }
             refresh_gui_after("get");
         }
@@ -267,65 +279,56 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private String wrapper_for_rest_utility(
-            String resource_id,
-            String input_json,
-            String action)
+    // trigger async http request; return roger that immediately for user friendly
+    private String wrapper_for_rest_utility(String resource_id, String input_json, String action)
     {
         Log.d("DM: wrapper_for_rest...", "... " + resource_id);
         String data4return = "";
-        MyRestAPI my_api = new MyRestAPI(edittext_ip.getText().toString(),
-                edittext_port.getText().toString(),
-                my_context);
-        switch(action)
+        String string_ip = edittext_ip.getText().toString();
+        String string_port = edittext_port.getText().toString();
+        MyRestAPI my_api = new MyRestAPI(string_ip, string_port, my_context);
+        // perform http request
+        if (my_api.isOnline())
         {
-            case "get":
-                if (resource_id.length()>0)
-                {
-                    data4return = my_api.rest_get(resource_id);
-                }
-                else
-                {
-                    data4return = "{\'status\'=\'internal error\'}";
-                }
-                break;
-            case "put":
-                data4return = my_api.rest_put(resource_id, input_json);
-                break;
-            case "post":
-                data4return = my_api.rest_post(resource_id, input_json);
-                break;
-            case "delete":
-                data4return = my_api.rest_delete(resource_id);
-                break;
-            default:
-                data4return = "{\'status\'=\'out of scope\'}";
-                break;
+            String format = "to %s %s";
+            data4return = String.format(format, action, resource_id);
+            switch (action)
+            {
+                case "delete":
+                    new MyHttpHelper().execute(my_api.rest_get_full_url(resource_id), action, "");
+                    break;
+                case "put":
+                case "post":
+                    new MyHttpHelper().execute(my_api.rest_get_full_url(resource_id),
+                            action, input_json);
+                    break;
+                default:
+                    Log.e("DM: wrapper_for_rest_", "fail to integrate " + action);
+                    break;
+            }
         }
         return data4return;
     }
 
     private void action_for_spinner_nothing_selected() {
-        Toast.makeText(my_context,
-                "[todo] nothing to do?",
-                Toast.LENGTH_SHORT).show();
+
     }
 
     // https://developer.android.com/training/basics/network-ops/connecting.html#connection
     class MyHttpHelper extends AsyncTask<String, Void, String>
     {
-        String extra_option = "";
-        String user_action = "";
-
+        String string_url = "";
+        String string_method = "";
+        String string_json = "";
         @Override
-        protected String doInBackground(String... urls)
+        protected String doInBackground(String... urls)  // --> returning value was stored in result of onPostExecute
         {
-            String string_url = urls[0];
-            String string_method = urls[1];
-            user_action = string_method;
-            extra_option = urls[2];
-            try {
-                return doRest(string_url, string_method);
+            string_url = urls[0];
+            string_method = urls[1];
+            string_json = urls[2];
+            try
+            {
+                return doRest(string_url, string_method, string_json);
             } catch (IOException e) {
                 return "Unable to retrieve web page. URL may be invalid.";
             }
@@ -334,22 +337,60 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result)
         {
-            if (user_action == "get")
+            Log.d("DM: onPostExecute", "to " + string_method + " " + string_url + " ... " + result);
+            if (string_method.equals("delete"))
             {
-                switch(extra_option)
+                String[] returnedArray = parse_json_field_list(result);
+                if (returnedArray.length == 2 && returnedArray[0].equals("string"))
                 {
-                    case "listing":
-                        Log.d("DM: onPostExecute", extra_option + " ... " + result);
-                        String[] returnedArray = parse_json_field_list(result, extra_option);
-                        callback_draw_spinner(returnedArray);
-                        break;
-                    case "value":
-                        Log.d("DM: onPostExecute", extra_option + " ... " + result);
-                        String[] returnedString = parse_json_field_list(result, extra_option);
-                        callback_draw_edittext(returnedString[0]);
-                    default: // else is edittext
-                        Log.w("DM: onPostExecute", "fail to integrate ..." + extra_option);
-                        break;
+                    callback_toast(returnedArray[1] + " has been deleted");
+                }
+            }
+            else if (string_method.equals("get"))
+            {
+                String[] returnedArray = parse_json_field_list(result);
+                //for (String i:returnedArray) { Log.d("DM: onPostExecute", " --> " + i); }
+                if (returnedArray.length >= 1)
+                {
+                    String decision = returnedArray[0];
+                    switch (decision)
+                    {
+                        case "listing":
+                            if (returnedArray.length > 1)
+                            {
+                                callback_draw_spinner(Arrays.copyOfRange(returnedArray, 1, returnedArray.length) );
+                            }
+                            else // empty
+                            {
+                                callback_draw_spinner(null);
+                            }
+                            break;
+                        case "value":
+                            callback_draw_edittext(returnedArray[1]);
+                            break;
+                        case "reason":
+                            for (int i=1; i<returnedArray.length; i++)
+                            {
+                                Toast.makeText(my_context, "rest api: " + returnedArray[i],
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                            break;
+                        default:
+                            Log.e("onPostExecute", "Internal Programming Error: " + decision);
+                            break;
+                    }
+                }
+                else
+                {
+                    Log.e("onPostExecute", "Internal Programming Error");
+                }
+            }
+            else // put. post, others
+            {
+                String[] returnedArray = parse_json_field_list(result);
+                if (returnedArray.length > 0) // some error occurs,
+                {
+                    callback_draw_error_reason(returnedArray);
                 }
             }
         }
@@ -360,63 +401,107 @@ public class MainActivity extends AppCompatActivity {
             return s.hasNext() ? s.next() : "";
         }
 
-
-        private String[] parse_json_field_list(String json_buffer, String field_name)
+        // return String[]
+        // String[0]: status code, N ~ 0 ~ -N
+        // String[1 ~ n]:
+        private String[] parse_json_field_list(String json_buffer)
         {
             String[] result = null;
             try {
                 JSONObject object_json = new JSONObject(json_buffer);
                 int status = object_json.getInt("status");
-                if (status > 0)
+                Log.d("DM: parse_json_", "status = " + String.valueOf(status));
+                Log.d("DM: parse_json_", "json_buffer = " + json_buffer);
+                if (status > 0)  // listing (list) for element ids
                 {
-                    if (field_name == "listing")
+                    JSONArray array = object_json.getJSONArray("listing");
+                    result = new String[array.length()+1];
+                    for (int i = 0; i < array.length(); i++)
                     {
-                        JSONArray array = object_json.getJSONArray(field_name);
-                        result = new String[array.length()];
-                        for (int i = 0; i < array.length(); i++) {
-                            result[i] = array.getString(i);
+                        result[i+1] = array.getString(i);
+                    }
+                    result[0] = String.valueOf("listing");
+                }
+                else if (status == 0)  // value (string) , or listing ( empty list)
+                {
+                    if (object_json.has("value"))
+                    {
+                        try {
+                            JSONObject inner = object_json.getJSONObject("value");
+                            result = new String[2];
+                            result[0] = String.valueOf("value");
+                            result[1] = inner.toString(2);
+                        }catch(JSONException e)
+                        {
+                            result = new String[2];
+                            result[0] = String.valueOf("string");
+                            result[1] = String.valueOf(object_json.getString("value"));
                         }
                     }
-                    else if (field_name == "value")
+                    else if (object_json.has("listing"))
                     {
-                        JSONObject inner = object_json.getJSONObject(field_name);
                         result = new String[1];
-                        result[0] = inner.toString(2);
+                        result[0] = String.valueOf("listing");
                     }
                 }
+                else // reason (list), for failure
+                {
+                    JSONArray array = object_json.getJSONArray("reason");
+                    result = new String[array.length()+1];
+                    for (int i = 0; i < array.length(); i++)
+                    {
+                        result[i+1] = array.getString(i);
+                    }
+                    result[0] = String.valueOf("reason");
+                }
+
             }catch(JSONException e)
             {
-                Log.d("DM: parse_json_", e.getMessage());
+                Log.w("DM: parse_json_", e.getMessage());
+                result = new String[1];
+                result[0] = String.valueOf(e.getMessage());
             }
             if (result == null)
             {
                 result = new String[1];
-                result[0] = "";
+                result[0] = String.valueOf("error");
             }
             return result;
         }
 
         // return String, which is http body
-        private String doRest(String string_url, String string_method) throws IOException
+        private String doRest(String string_url, String string_method, String string_json) throws IOException
         {
-            Log.d("DM: doRest", "string_url: " + string_url);
-            Log.d("DM: doRest", "string_method: " + string_method);
+            Log.d("DM: doRest", string_method + " " + string_url);
             InputStream is = null;
             int len = 1024; // http content length limitation
             try {
                 URL url = new URL(string_url);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(10000 /* milliseconds */);
-                conn.setConnectTimeout(15000 /* milliseconds */);
+                conn.setReadTimeout(10000);
+                conn.setConnectTimeout(15000);
+                // http method
                 conn.setRequestMethod(string_method.toUpperCase());
+                // http body
+                if (string_method.equals("put") || string_method.equals("post"))
+                {
+                    conn.setDoOutput(true);
+                    conn.setRequestProperty("content-type", "application/json; charset=utf-8");
+                    OutputStream os = conn.getOutputStream();
+                    os.write(string_json.getBytes());
+                    os.flush();
+                    os.close();
+                }
                 conn.setDoInput(true);
                 conn.connect();
+                // response header
                 int response = conn.getResponseCode();
                 Log.d("DM: doRest", "HTTP code: " + response);
+                // response body
                 is = conn.getInputStream();
                 String contentAsString = convertStreamToString(is);
                 Log.d("DM: doRest", "HTTP body: " + contentAsString);
-                return contentAsString;
+                return String.valueOf(contentAsString);
             } finally {
                 if (is != null) {
                     try { is.close(); }
@@ -427,10 +512,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 }
-
-
 
 class MyRestAPI
 {
@@ -455,25 +537,12 @@ class MyRestAPI
         return (networkInfo != null && networkInfo.isConnected());
     }
 
-    private String _http_get_list()
-    {
-        String str_format = "http://%s:%s/%s";
-        String str_returned = "no networking";
-        if (! isOnline())
-        {
-            return str_returned;
-        }
-        Log.d("DM: _http_get_list", "_isOnline yes!");
-        str_returned = "not implement yet";
-        return str_returned;
-    }
-
-
     protected String rest_get_full_url()
     {
-        String format = "http://%s:%s%s";
-        String string_returned = String.format(format, string_ip, string_port, string_path);
-        return string_returned;
+        //String format = "http://%s:%s%s";
+        //String string_returned = String.format(format, string_ip, string_port, string_path);
+        //return string_returned;
+        return rest_get_full_url("");
     }
 
     protected String rest_get_full_url(String string_id)
@@ -497,27 +566,6 @@ class MyRestAPI
         return field_name;
     }
 
-    protected String[] rest_get()
-    {
-        Log.d("DM: rest_get", _http_get_list());
-        SecureRandom random = new SecureRandom();
-        int number = random.nextInt(20);
-        Log.d("DM: rest_get", "number = " + String.valueOf(number));
-        String[] array = new String[number+1];
-        array[0] = String.valueOf("... new create ...");
-        for (int i=1; i< number+1; i++)
-        {
-            array[i] = new BigInteger(64, random).toString(40);
-        }
-        return array;
-    }
-
-    protected String rest_get(String resource_id)
-    {
-        String str_format = "{\n  \'ip\':%s,  \'port\':%s       \n}";
-        return String.format(str_format, string_ip, string_port);
-    }
-
     protected String rest_put(String resource_id, String string_json)
     {
         //return "{\n" + " 'name': " + resource_id + ", \n" + " \n}";
@@ -532,12 +580,6 @@ class MyRestAPI
         return String.format(str_format, resource_id, string_json);
     }
 
-    protected String rest_delete(String resource_id)
-    {
-        //return "{\n" + " 'name': " + resource_id + ", \n" + " \n}";
-        String str_format = "{\n  \'delete\':%s,\n}";
-        return String.format(str_format, resource_id);
-    }
 
 } // end of class MyRestAPI
 

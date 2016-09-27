@@ -1,5 +1,7 @@
 # https://github.com/github/gitignore
 
+# pycharm
+.idea/
 
 # sonarqube
 .sonar/

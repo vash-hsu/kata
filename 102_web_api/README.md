@@ -2,6 +2,11 @@
 
 * RESTful API hosting by Python (flask)
  * reference: http://blog.luisrei.com/articles/flaskrest.html
+
+* Android App as REST API Client
+ * reference:
+  * https://developer.android.com/training/basics/network-ops/managing.html
+  * https://developer.android.com/training/basics/network-ops/connecting.html#http-client
   
 --
 ##WEB API Implementation by Flask(python) 
@@ -66,7 +71,15 @@
 ##Android App to Interact with Web API
 ### ../103_rest_client
 * (done) android app with one activity, one spinner, four editTexts and few buttons
-* (todo) integrate http request for rest API demo]
+* Spinner
+ * (done) listing all elements' names, via http get
+ * (done) show value of selected element, via http get 
+* Buttons
+ * (todo) put
+ * (todo) post
+ * (todo) delete
+
+* (todo) integrate http request for rest API demo
   
 --
 ##to do

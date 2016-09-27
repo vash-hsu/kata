@@ -35,7 +35,7 @@
                 android:layout_width="147dp"
                 android:layout_height="match_parent"
                 android:inputType="textPersonName"
-                android:text="192.168.2.103"
+                android:text="192.168.2.102"
                 android:ems="10"
                 android:id="@+id/edittext_ip"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display1"
@@ -128,7 +128,8 @@
             android:isScrollContainer="true"
             android:keepScreenOn="true"
             android:background="#00FFFF"
-            android:layout_weight="0.23" />
+            android:layout_weight="0.23"
+            android:textSize="20sp" />
         </ScrollView>
 
         <LinearLayout

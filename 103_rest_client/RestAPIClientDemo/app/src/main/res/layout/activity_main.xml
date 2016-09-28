@@ -138,17 +138,17 @@
             android:layout_height="wrap_content">
 
             <Button
-                android:text="Create/PUT"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:id="@+id/button2put"
-                android:layout_weight="1" />
-
-            <Button
-                android:text="Update/POST"
+                android:text="Create/POST"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:id="@+id/button2post"
+                android:layout_weight="1" />
+
+            <Button
+                android:text="Update/PUT"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/button2put"
                 android:layout_weight="1" />
 
         </LinearLayout>

@@ -76,8 +76,8 @@ public class MainActivity extends AppCompatActivity {
         edittext_rid.setText("");
         edittext_json.setText("{\n\n}");
         my_spinner.setSelection(0);
-        button2put.setVisibility(View.VISIBLE);
-        button2post.setVisibility(View.INVISIBLE);
+        button2post.setVisibility(View.VISIBLE);
+        button2put.setVisibility(View.INVISIBLE);
         button2delete.setVisibility(View.INVISIBLE);
         button2reset.setVisibility(View.VISIBLE);
     }
@@ -94,14 +94,14 @@ public class MainActivity extends AppCompatActivity {
     private void _initialize_button()
     {
         Log.d("DM: _initialize_button", "... ");
-        button2put = (Button) findViewById(R.id.button2put);
         button2post = (Button) findViewById(R.id.button2post);
+        button2put = (Button) findViewById(R.id.button2put);
         button2delete = (Button) findViewById(R.id.button2delete);
         button2reset = (Button) findViewById(R.id.button2reset);
-        button2put.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) { action_for_button(button2put); } });
         button2post.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) { action_for_button(button2post); } });
+        button2put.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) { action_for_button(button2put); } });
         button2delete.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) { action_for_button(button2delete); } });
         button2reset.setOnClickListener(new View.OnClickListener() {
@@ -185,8 +185,8 @@ public class MainActivity extends AppCompatActivity {
         switch (action)
         {
             case "get":
-                button2put.setVisibility(View.INVISIBLE);
-                button2post.setVisibility(View.VISIBLE);
+                button2post.setVisibility(View.INVISIBLE);
+                button2put.setVisibility(View.VISIBLE);
                 button2delete.setVisibility(View.VISIBLE);
                 break;
             case "put":
@@ -196,8 +196,8 @@ public class MainActivity extends AppCompatActivity {
                 draw_gui();
                 break;
             default:
-                button2put.setVisibility(View.VISIBLE);
                 button2post.setVisibility(View.INVISIBLE);
+                button2put.setVisibility(View.INVISIBLE);
                 button2delete.setVisibility(View.INVISIBLE);
                 break;
         }
@@ -215,20 +215,17 @@ public class MainActivity extends AppCompatActivity {
         {
             case R.id.button2put:
                 result = wrapper_for_rest_utility(resource_id, json_text, "put");
-                Toast.makeText(my_context, "putting " + resource_id + " then " + result,
-                        Toast.LENGTH_SHORT).show();
+                callback_toast(result);
                 refresh_gui_after("put");
                 break;
             case R.id.button2post:
                 result = wrapper_for_rest_utility(resource_id, json_text, "post");
-                Toast.makeText(my_context, "posting " + resource_id + " then " + result,
-                        Toast.LENGTH_SHORT).show();
+                callback_toast(result);
                 refresh_gui_after("post");
                 break;
             case R.id.button2delete:
                 result = wrapper_for_rest_utility(resource_id, "", "delete");
-                Toast.makeText(my_context, result,
-                        Toast.LENGTH_SHORT).show();
+                callback_toast(result);
                 refresh_gui_after("delete");
                 break;
             case R.id.button2reset:
@@ -344,6 +341,28 @@ public class MainActivity extends AppCompatActivity {
                 if (returnedArray.length == 2 && returnedArray[0].equals("string"))
                 {
                     callback_toast(returnedArray[1] + " has been deleted");
+                }
+            }
+            else if (string_method.equals("put"))
+            {
+                String[] returnedArray = parse_json_field_list(result);
+                //
+                for (String i:returnedArray)
+                {
+                    Log.d("DM: === put ===", i);
+                }
+                //
+                if (returnedArray.length == 2 && returnedArray[0].equals("string"))
+                {
+                    callback_toast(returnedArray[1] + " has been updated by put");
+                }
+            }
+            else if (string_method.equals("post"))
+            {
+                String[] returnedArray = parse_json_field_list(result);
+                if (returnedArray.length == 2 && returnedArray[0].equals("string"))
+                {
+                    callback_toast(returnedArray[1] + " has been created by post");
                 }
             }
             else if (string_method.equals("get"))
@@ -492,13 +511,18 @@ public class MainActivity extends AppCompatActivity {
                     os.flush();
                     os.close();
                 }
-                conn.setDoInput(true);
+                else // get or delete
+                {
+                    conn.setDoInput(true);
+                }
                 conn.connect();
                 // response header
                 int response = conn.getResponseCode();
                 Log.d("DM: doRest", "HTTP code: " + response);
                 // response body
-                is = conn.getInputStream();
+                is = conn.getErrorStream();
+                if (is == null)
+                    is = conn.getInputStream();
                 String contentAsString = convertStreamToString(is);
                 Log.d("DM: doRest", "HTTP body: " + contentAsString);
                 return String.valueOf(contentAsString);

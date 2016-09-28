@@ -450,14 +450,14 @@ def _api_put(json_meta, resource_id=None):
     api_log.info("putting {} with {}".
                  format(resource_id, demjson.encode(json_meta)))
     _update_to_internal_storage(id=resource_id, data=json_meta)
-    status = '1'
-    return_data = demjson.encode({'status': status, 'id': resource_id})
+    status = 0
+    return_data = demjson.encode({'status': status, 'value': resource_id})
     api_log.info("success({}) to put resource id = {}".
                  format(status, resource_id))
     return return_data
 
 
-# POST: adds item
+# POST: create/adds item
 # update name:value, where name was created in runtime
 def _api_post(json_meta):
     """
@@ -468,8 +468,8 @@ def _api_post(json_meta):
     api_log.debug("posting {} with {}".format(resource_id,
                                                 demjson.encode(json_meta)))
     _update_to_internal_storage(id=resource_id, data=json_meta)
-    status = '1'
-    return_data = demjson.encode({'status': status, 'id': resource_id})
+    status = 0
+    return_data = demjson.encode({'status': status, 'value': resource_id})
     api_log.info("success({}) to post resource id = {}".format(status,
                                                                resource_id))
 

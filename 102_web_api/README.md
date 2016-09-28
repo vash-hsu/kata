@@ -80,11 +80,6 @@
  * (done) show value of selected element, via http get 
 * Buttons
  * (done) delete
- * (todo) put
- * (todo) post
-
-* (todo) integrate http request for rest API demo
-  
---
-##to do
-* (tba) Android App to Interact with Web API
+ * (done) put
+ * (done) post
+ * (done) reset

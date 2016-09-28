@@ -319,20 +319,26 @@ def _handle_api_and_json(method, headers, data, resource_id=None):
                 http_log.warning("fail to put {} because it\'s not existent"
                                  .format(resource_id))
         elif method == "POST":  # insert new
-            if resource_id is None or len(resource_id) == 0:
-                return _api_post(json_in_dict)
+            if resource_id and len(resource_id) > 0:
+                if _is_valid_id(resource_id):
+                    http_log.warning("not allow existent id {} for post".
+                                     format(resource_id))
+                    error_msg.append("not allow existent id {} for post".
+                                     format(resource_id))
+                else:
+                    http_log.debug("post with user-defined resource id {}".
+                                   format(resource_id))
+                    return _api_post(json_in_dict, resource_id=resource_id)
             else:
-                error_msg.append("POST needs not user-specified resource_id")
-                http_log.warning("not allow specified resource_id {} for post".
-                                 format(resource_id))
+                return _api_post(json_in_dict)
         else:
             error_msg.append('not support method with %s' % repr(resource_id))
             http_log.warning("not support method {} on resource_id {}".
                              format(method, repr(resource_id)))
-    # return demjson.encode({'status': str(0-len(error_msg)),
-    #                       'reason': error_msg})
     return demjson.encode({'status': str(0-len(error_msg)),
-                           'reason': "; ".join(error_msg)})
+                           'reason': error_msg})
+    # return demjson.encode({'status': str(0-len(error_msg)),
+    #                       'reason': "; ".join(error_msg)})
 
 
 # ===
@@ -459,14 +465,18 @@ def _api_put(json_meta, resource_id=None):
 
 # POST: create/adds item
 # update name:value, where name was created in runtime
-def _api_post(json_meta):
+def _api_post(json_meta, resource_id=None):
     """
     :param json_meta:
+    :param resource_id: if not provided, use sha1 of json instead
     :return: json
     """
-    resource_id = _get_sha1_in_string(json_meta)
+    if not resource_id:
+        resource_id = _get_sha1_in_string(json_meta)
+        while _is_valid_id(resource_id):  # to avoid collision
+            resource_id = _get_sha1_in_string(resource_id)
     api_log.debug("posting {} with {}".format(resource_id,
-                                                demjson.encode(json_meta)))
+                                              demjson.encode(json_meta)))
     _update_to_internal_storage(id=resource_id, data=json_meta)
     status = 0
     return_data = demjson.encode({'status': status, 'value': resource_id})

@@ -3,6 +3,7 @@ package com.blogspot.rulesare.restapiclientdemo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -77,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         edittext_json.setText("{\n\n}");
         my_spinner.setSelection(0);
         button2post.setVisibility(View.VISIBLE);
+        edittext_rid.setEnabled(true);
         button2put.setVisibility(View.INVISIBLE);
         button2delete.setVisibility(View.INVISIBLE);
         button2reset.setVisibility(View.VISIBLE);
@@ -186,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
         {
             case "get":
                 button2post.setVisibility(View.INVISIBLE);
+                edittext_rid.setEnabled(false);
                 button2put.setVisibility(View.VISIBLE);
                 button2delete.setVisibility(View.VISIBLE);
                 break;
@@ -246,10 +249,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.LENGTH_SHORT).show();
     }
 
-    private void callback_draw_error_reason(String[] error)
-    {
-
-    }
 
     //  [networking] --> MyHttpHelper() --> callback_draw_edittext()
     private void action_for_spinner_selected(int position)
@@ -335,82 +334,58 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result)
         {
             Log.d("DM: onPostExecute", "to " + string_method + " " + string_url + " ... " + result);
-            if (string_method.equals("delete"))
+            String[] returnedArray = parse_json_field_list(result);
+            // error first
+            if (returnedArray.length == 0)
             {
-                String[] returnedArray = parse_json_field_list(result);
-                if (returnedArray.length == 2 && returnedArray[0].equals("string"))
-                {
-                    callback_toast(returnedArray[1] + " has been deleted");
-                }
+                callback_toast("internal error, fail to retrieve json parsing result");
             }
-            else if (string_method.equals("put"))
+            else if (returnedArray.length > 1 && returnedArray[0].equals("reason"))
             {
-                String[] returnedArray = parse_json_field_list(result);
-                //
-                for (String i:returnedArray)
-                {
-                    Log.d("DM: === put ===", i);
-                }
-                //
-                if (returnedArray.length == 2 && returnedArray[0].equals("string"))
-                {
-                    callback_toast(returnedArray[1] + " has been updated by put");
-                }
+                for (int i=1; i<returnedArray.length; i++) { callback_toast(returnedArray[i]); }
             }
-            else if (string_method.equals("post"))
+            else if (returnedArray.length == 2 && returnedArray[0].equals("string"))
             {
-                String[] returnedArray = parse_json_field_list(result);
-                if (returnedArray.length == 2 && returnedArray[0].equals("string"))
+                if (string_method.equals("delete"))
+                { callback_toast(returnedArray[1] + " has been deleted"); }
+                else if (string_method.equals("put"))
+                { callback_toast(returnedArray[1] + " has been updated by put"); }
+                else if (string_method.equals("post"))
                 {
                     callback_toast(returnedArray[1] + " has been created by post");
                 }
             }
             else if (string_method.equals("get"))
             {
-                String[] returnedArray = parse_json_field_list(result);
-                //for (String i:returnedArray) { Log.d("DM: onPostExecute", " --> " + i); }
-                if (returnedArray.length >= 1)
+                switch (returnedArray[0])
                 {
-                    String decision = returnedArray[0];
-                    switch (decision)
-                    {
-                        case "listing":
-                            if (returnedArray.length > 1)
-                            {
-                                callback_draw_spinner(Arrays.copyOfRange(returnedArray, 1, returnedArray.length) );
-                            }
-                            else // empty
-                            {
-                                callback_draw_spinner(null);
-                            }
-                            break;
-                        case "value":
-                            callback_draw_edittext(returnedArray[1]);
-                            break;
-                        case "reason":
-                            for (int i=1; i<returnedArray.length; i++)
-                            {
-                                Toast.makeText(my_context, "rest api: " + returnedArray[i],
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                            break;
-                        default:
-                            Log.e("onPostExecute", "Internal Programming Error: " + decision);
-                            break;
-                    }
-                }
-                else
-                {
-                    Log.e("onPostExecute", "Internal Programming Error");
+                    case "listing":
+                        if (returnedArray.length > 1)
+                        {
+                            callback_draw_spinner(Arrays.copyOfRange(returnedArray, 1, returnedArray.length) );
+                        }
+                        else // empty
+                        {
+                            callback_draw_spinner(null);
+                        }
+                        break;
+                    case "value":
+                        callback_draw_edittext(returnedArray[1]);
+                        break;
+                    case "reason":
+                        for (int i=1; i<returnedArray.length; i++)
+                        {
+                            callback_toast("rest api: " + returnedArray[i]);
+                        }
+                        break;
+                    default:
+                        Log.e("onPostExecute", "internal error, not able to handle " + returnedArray[0]);
+                        break;
                 }
             }
-            else // put. post, others
+            else // others ... ?
             {
-                String[] returnedArray = parse_json_field_list(result);
-                if (returnedArray.length > 0) // some error occurs,
-                {
-                    callback_draw_error_reason(returnedArray);
-                }
+                for (String i:parse_json_field_list(result)) { callback_toast(i); }
             }
         }
 

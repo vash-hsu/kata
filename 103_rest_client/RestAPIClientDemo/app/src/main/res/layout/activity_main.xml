@@ -78,7 +78,8 @@
                 android:layout_width="match_parent"
                 android:id="@+id/spinner"
                 android:spinnerMode="dropdown"
-                android:layout_height="40sp" />
+                android:layout_height="40sp"
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -129,7 +130,8 @@
             android:keepScreenOn="true"
             android:background="#00FFFF"
             android:layout_weight="0.23"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:selectAllOnFocus="false" />
         </ScrollView>
 
         <LinearLayout
@@ -170,7 +172,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:id="@+id/button2reset"
-                android:layout_weight="1" />
+                android:layout_weight="1"/>
         </LinearLayout>
 
     </LinearLayout>

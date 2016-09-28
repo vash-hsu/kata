@@ -54,7 +54,7 @@ class TestFlaskRequest(unittest.TestCase):
         self.assertEqual(header['status'], '200')
         self.assertEqual(header['content-type'], "application/json")
         json_dict = demjson.decode(body)
-        self.assertEqual(json_dict["status"], '1')
+        self.assertEqual(json_dict["status"], 0)
 
     def test_api_v1_api_get_element_by_not_found_id(self):
         "=== GET  with undefined resource_id, and then get JSON back with status 0"
@@ -63,10 +63,13 @@ class TestFlaskRequest(unittest.TestCase):
         self.assertEqual(header['status'], '200')
         self.assertEqual(header['content-type'], "application/json")
         json_dict = demjson.decode(body)
-        self.assertEqual(json_dict["status"], '0')
+        self.assertLessEqual(json_dict["status"], -1) # because error occurs
+        print
+        for i in json_dict["reason"]:
+            print "DM: reason = {%s}" % i
 
     def test_api_v1_put_by_existent_id(self):
-        "=== PUT /api/v1/resource/golden_data and get status=1 in jason back"
+        "=== PUT /api/v1/resource/golden_data and get status=0 and value=golden_data"
         target_url = self.host_url + "/api/v1/resource/test_data"
         prepared_body = demjson.encode({'new_element': 'new data'})
         prepared_header = {'Content-Type': 'application/json'}
@@ -75,8 +78,8 @@ class TestFlaskRequest(unittest.TestCase):
                                            headers=prepared_header)
         self.assertEqual(header['status'], '200')
         json_dict = demjson.decode(body)
-        self.assertEqual(json_dict['status'], '1')
-        self.assertEqual(json_dict['id'], 'test_data')
+        self.assertEqual(json_dict['status'], 0)
+        self.assertEqual(json_dict['value'], 'test_data')
 
     def test_api_v1_put_disallow_nonexistent_id(self):
         "=== PUT /api/v1/resource/undefined and get status=-1 " \
@@ -89,8 +92,9 @@ class TestFlaskRequest(unittest.TestCase):
                                            headers=prepared_header)
         self.assertEqual(header['status'], '200')
         json_dict = demjson.decode(body)
-        self.assertLess(json_dict['status'], '0')
-        # print "DM: json_dict =", repr(json_dict)
+        self.assertLessEqual(json_dict['status'], -1)
+        print
+        print "DM: json_dict =", repr(json_dict["reason"])
 
     def test_api_v1_post_by_creating_new_id_without_slash(self):
         "=== POST /api/v1/resource and get status=1 after inserting new resource_id"
@@ -102,8 +106,8 @@ class TestFlaskRequest(unittest.TestCase):
                                            headers=prepared_header)
         self.assertEqual(header['status'], '200')
         json_dict = demjson.decode(body)
-        self.assertEqual(json_dict['status'], '1', 'ending without slash')
-        self.assertEqual(len(json_dict['id']), 40) # in form of sha1 string
+        self.assertEqual(json_dict['status'], 0)
+        self.assertEqual(len(json_dict['value']), 40) # in form of sha1 string
 
     def test_api_v1_post_by_creating_new_id_with_slash(self):
         "=== POST /api/v1/resource/ and get status=1 after inserting new resource_id"
@@ -115,8 +119,8 @@ class TestFlaskRequest(unittest.TestCase):
                                            headers=prepared_header)
         self.assertEqual(header['status'], '200')
         json_dict = demjson.decode(body)
-        self.assertEqual(json_dict['status'], '1', 'ending with slash')
-        self.assertEqual(len(json_dict['id']), 40) # in form of sha1 string
+        self.assertEqual(json_dict['status'], 0)
+        self.assertEqual(len(json_dict['value']), 40) # in form of sha1 string
 
     def test_api_v1_post_then_delete(self):
         "=== POST /api/v1/resource/ and get resource_id back, then DELETE it"
@@ -128,8 +132,8 @@ class TestFlaskRequest(unittest.TestCase):
                                            headers=prepared_header)
         self.assertEqual(header['status'], '200')
         json_dict = demjson.decode(body)
-        self.assertEqual(json_dict['status'], '1')
-        working_resource_id = json_dict['id']
+        self.assertEqual(json_dict['status'], 0)
+        working_resource_id = json_dict['value']
         # then delete it
         target_url = self.host_url + "/api/v1/resource" + \
                      "/" + working_resource_id
@@ -140,8 +144,8 @@ class TestFlaskRequest(unittest.TestCase):
                                            headers=prepared_header)
         self.assertEqual(header['status'], '200')
         json_dict = demjson.decode(body)
-        self.assertEqual(json_dict['status'], '1')
-        self.assertEqual(json_dict['id'],
+        self.assertEqual(json_dict['status'], 0)
+        self.assertEqual(json_dict['value'],
                          working_resource_id,
                          "kill the wrong guy?")
 
@@ -156,8 +160,9 @@ class TestFlaskRequest(unittest.TestCase):
                                            headers=prepared_header)
         self.assertEqual(header['status'], '200')
         json_dict = demjson.decode(body)
-        self.assertEqual(json_dict['status'], '-1')
-        print "DM:", repr(json_dict)
+        self.assertLessEqual(json_dict['status'], -1)
+        print
+        print "DM:", repr(json_dict['reason'])
 
     def test_api_v1_delete_disallow_action_without_id(self):
         "=== DELETE /api/v1/resource and get status=-1 "
@@ -169,7 +174,7 @@ class TestFlaskRequest(unittest.TestCase):
                                            headers=prepared_header)
         self.assertEqual(header['status'], '200')
         json_dict = demjson.decode(body)
-        self.assertEqual(json_dict['status'], '-1')
+        self.assertLessEqual(json_dict['status'], -1)
         # with slash
         target_url = self.host_url + "/api/v1/resource/"
         prepared_body = demjson.encode({})
@@ -179,7 +184,7 @@ class TestFlaskRequest(unittest.TestCase):
                                            headers=prepared_header)
         self.assertEqual(header['status'], '200')
         json_dict = demjson.decode(body)
-        self.assertEqual(json_dict['status'], '-1')
+        self.assertLessEqual(json_dict['status'], -1)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

@@ -335,7 +335,7 @@ def _handle_api_and_json(method, headers, data, resource_id=None):
             error_msg.append('not support method with %s' % repr(resource_id))
             http_log.warning("not support method {} on resource_id {}".
                              format(method, repr(resource_id)))
-    return demjson.encode({'status': str(0-len(error_msg)),
+    return demjson.encode({'status': 0-len(error_msg),
                            'reason': error_msg})
     # return demjson.encode({'status': str(0-len(error_msg)),
     #                       'reason': "; ".join(error_msg)})

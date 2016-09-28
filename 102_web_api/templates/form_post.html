@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Manipulation</title>
+  <title>console for POST/New</title>
   <script src="/static/script/jquery-3.1.1.min.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="/static/css/bootstrap.css">
@@ -40,7 +40,7 @@
   <label class="col-md-4 control-label" for="button1id">Upload</label>
   <div class="col-md-8">
     <button id="button2post" name="button2post" class="btn btn-success">Post</button>
-    <button id="button2cancel" name="button2cancel" class="btn btn-danger">Cancel</button>
+    <button id="button2cancel" name="button2cancel" class="btn btn-danger">Reset</button>
   </div>
 </div>
 
@@ -67,7 +67,7 @@ function post_json(_url, user_input)
       }
       else
       {
-        var resource_id = resultData.id;
+        var resource_id = resultData.value;
         alert('Successfully to update resource '.concat(resource_id));
         if (referer_url.length == 0) // close current tab
         {

@@ -45,7 +45,8 @@
 <div class="form-group">
   <label class="col-md-4 control-label" for="json_input">JSON</label>
   <div class="col-md-4">
-    <textarea class="form-control" id="json_input" name="json_input">{'name': 'value'}</textarea>
+    <textarea class="form-control" id="json_input" name="json_input" rows="6">
+      {'name': 'value'}</textarea>
   </div>
 </div>
 
@@ -54,7 +55,7 @@
   <label class="col-md-4 control-label" for="button2confirm">action</label>
   <div class="col-md-8">
     <button id="button2confirm" name="button2confirm" class="btn btn-success">Confirm</button>
-    <button id="button2cancel" name="button2cancel" class="btn btn-danger">Cancel</button>
+    <button id="button2cancel" name="button2cancel" class="btn btn-danger">Reload</button>
   </div>
 </div>
 
@@ -75,12 +76,14 @@ var resource_id = "{{ delete }}";
 {% endif %}
 
 var referer_url = "{{ referer_url }}";
+document.title = "console for " + action_type.toUpperCase();
 
 function update_text_field(json_object)
 {
   // console.log(raw_data);
   // alert("server return status = ".concat(json_object.status))
-  document.getElementById("json_input").value = JSON.stringify(json_object.value);
+  document.getElementById("json_input").value = JSON.stringify(
+    json_object.value, null, 2);
   document.getElementById("button2confirm").disabled = false;
 }
 

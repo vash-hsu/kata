@@ -114,7 +114,8 @@ def console(opcode='get'):
         return render_template("get.html",
                                resource_url="/api/v1/resource",
                                ui_put_url="/ui/put",
-                               ui_delete_url="/ui/delete")
+                               ui_delete_url="/ui/delete",
+                               ui_theme=opcode)
     elif opcode == 'post':
         return render_template("form_post.html",
                                resource_url="/api/v1/resource")

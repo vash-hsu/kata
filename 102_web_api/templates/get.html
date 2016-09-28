@@ -14,6 +14,9 @@
 var resource_path = "{{ resource_url }}";
 var ui_put_path = "{{ ui_put_url }}";
 var ui_delete_path = "{{ ui_delete_url }}";
+var ui_theme = "{{ ui_theme }}";
+
+document.title = "console for " + ui_theme.toUpperCase();
 
 function fun_get_resource_list(_base_url, _ui_put, _ui_delete)
 {
@@ -21,17 +24,16 @@ function fun_get_resource_list(_base_url, _ui_put, _ui_delete)
 
   // insert table to html body
   var body = document.body;
+  var div = document.createElement('div');
+  div.className = 'container';
   var table = document.createElement('table');
   table.className  = 'table table-striped';
   var tr = table.insertRow();
   var td = tr.insertCell();
   td.appendChild(document.createTextNode("name"));
+
   td = tr.insertCell();
-  td.appendChild(document.createTextNode("link for GET/list"));
-  td = tr.insertCell();
-  td.appendChild(document.createTextNode("link for PUT/update"));
-  td = tr.insertCell();
-  td.appendChild(document.createTextNode("link for DELETE/delete"));
+  td.appendChild(document.createTextNode("link for " + ui_theme));
   // retrieve data
   jQuery.ajax({
     url: _base_url,
@@ -45,33 +47,42 @@ function fun_get_resource_list(_base_url, _ui_put, _ui_delete)
           var tr = table.insertRow();
           var td = tr.insertCell();
           td.appendChild(document.createTextNode(element));
-          // url for get
-          td = tr.insertCell();
-          var target_url_path = _base_url.concat("/", element);
-          var a = document.createElement('a');
-          var linkText = document.createTextNode(target_url_path);
-          a.appendChild(linkText);
-          a.title = "click here to view!";
-          a.href = target_url_path;
-          td.appendChild(a);
-          // url for put
-          td = tr.insertCell();
-          target_url_path = _ui_put.concat("/", element);
-          a = document.createElement('a');
-          linkText = document.createTextNode(target_url_path);
-          a.appendChild(linkText);
-          a.title = "click here to update!";
-          a.href = target_url_path;
-          td.appendChild(a);
-          // url for delete
-          td = tr.insertCell();
-          target_url_path = _ui_delete.concat("/", element);
-          a = document.createElement('a');
-          linkText = document.createTextNode(target_url_path);
-          a.appendChild(linkText);
-          a.title = "click here to delete!";
-          a.href = target_url_path;
-          td.appendChild(a);
+          switch(ui_theme){
+            case 'get': // url for get
+              td = tr.insertCell();
+              var target_url_path = _base_url.concat("/", element);
+              var a = document.createElement('a');
+              var linkText = document.createTextNode(target_url_path);
+              a.appendChild(linkText);
+              a.title = "click here to view!";
+              a.href = target_url_path;
+              td.appendChild(a);
+              break;
+            case 'put':
+              // url for put
+              td = tr.insertCell();
+              target_url_path = _ui_put.concat("/", element);
+              a = document.createElement('a');
+              linkText = document.createTextNode(target_url_path);
+              a.appendChild(linkText);
+              a.title = "click here to update!";
+              a.href = target_url_path;
+              td.appendChild(a);
+              break;
+            case 'delete':
+              // url for delete
+              td = tr.insertCell();
+              target_url_path = _ui_delete.concat("/", element);
+              a = document.createElement('a');
+              linkText = document.createTextNode(target_url_path);
+              a.appendChild(linkText);
+              a.title = "click here to delete!";
+              a.href = target_url_path;
+              td.appendChild(a);
+              break;
+            default:
+              break;
+          }
         }
       );
     },
@@ -80,12 +91,14 @@ function fun_get_resource_list(_base_url, _ui_put, _ui_delete)
     timeout: 10000,
   });
   // ending
-  body.appendChild(table);
+  //body.appendChild(table);
+  div.appendChild(table);
+  body.appendChild(div);
 }
 
 fun_get_resource_list(resource_path, ui_put_path, ui_delete_path);
 
 </script>
- 
+
 </body>
 </html>

@@ -33,7 +33,7 @@
  * (pass) test_api_v1_post_by_creating_new_id_with_slash
   
 ###POST /resource/resource-id
-* (todo) add item to resource, with user-specified name (resource_id)
+* (done) add item to resource, with user-specified name (resource_id)
   
   
 ###DELETE /resource/resource-id

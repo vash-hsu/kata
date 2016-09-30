@@ -15,7 +15,7 @@
 | update (put) | ![browswer](demo/browswer_02_put.gif) | ![app](demo/app_02_put.gif) |
 | create (post) | ![browswer](demo/browswer_03_post.gif) | ![app](demo/app_03_post.gif) |
 | delete | ![browswer](demo/browswer_04_delete.gif) | ![app](demo/app_04_delete.gif) |
-| log | ![browswer](demo/browswer_05_log1.png) [content](demo/browswer_05_log1.png) |  |
+| log | ![browswer](demo/browswer_05_log1.png) [content](demo/browswer_05_log2.png) |  |
 
 ---
 

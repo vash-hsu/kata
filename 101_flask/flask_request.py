@@ -47,6 +47,7 @@ def valid_login(username, password):
 def log_the_user_in(username):
     return "Hello %s!" % username
 
+
 # /login
 # -----
 # POST /login HTTP/1.1
